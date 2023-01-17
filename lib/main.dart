@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'add_movie_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,23 +12,16 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData.dark(),
       home: const MyHomePage(),
     );
   }
-  
-  
 }
 
 class MyHomePage extends StatefulWidget {
@@ -38,13 +32,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final Stream<QuerySnapshot> _movieStream = FirebaseFirestore.instance.collection('Movies').snapshots();
+  final Stream<QuerySnapshot> _movieStream =
+      FirebaseFirestore.instance.collection('Movies').snapshots();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Movies App'),
+        title: const Text('Movies App'),
+        leading: IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext) {
+                  return const AddPage();
+                },
+                fullscreenDialog: true));
+          },
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _movieStream,
@@ -59,7 +64,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+              Map<String, dynamic> data =
+                  document.data()! as Map<String, dynamic>;
               return ListTile(
                 title: Text(data['name']),
                 subtitle: Text(data['poster']),
